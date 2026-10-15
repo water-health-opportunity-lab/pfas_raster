@@ -20,20 +20,20 @@ check3 <- ucmr3 %>%
     PWSID_FID = paste0(PWSID, "_", FacilityID)
   ) %>%
   distinct(
-    PWSID_FID, Contaminant, year
+    PWSID, PWSID_FID, Contaminant, year
   ) %>%
   count(
-    PWSID_FID,
-    name = "ucmr3_n_pfas_sampled_in_3_yrs"
-    )
+    PWSID,PWSID_FID,
+    name = "n"
+    ) 
 
 #### Check distribution of unique yearly readings
-hist(check3$ucmr3_n_pfas_sampled_in_3_yrs)
+hist(check3$n)
 
-#### Check n facilities with more than 2 unique years of data
+#### Check n facilities with more than 2 unique years of data (measurments span >12 month period)
 outlier3 <- check3 %>% 
   filter(
-    !(ucmr3_n_pfas_sampled_in_3_yrs %in% c(6, 12))
+    !(n %in% c(6, 12))
   )
 
 #### n NAs 
@@ -55,16 +55,16 @@ check5 <- ucmr5 %>%
   ) %>%
   count(
     PWSID_FID,
-    name = "ucmr5_n_pfas_sampled_in_3_yrs"
+    name = "n"
   )
 
 #### Check distribution of unique yearly readings
-hist(check5$ucmr5_n_pfas_sampled_in_3_yrs)
+hist(check5$n)
 
 #### Check n facilities with more than 2 unique years of data
 outlier5 <- check5 %>% 
   filter(
-    !(ucmr5_n_pfas_sampled_in_3_yrs %in% c(29, 58))
+    !(n %in% c(29, 58))
   )
 
 #### n NAs 
@@ -141,14 +141,27 @@ ucmr5 <- ucmr5 %>%
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(
       na, mrlrt2, AnalyticalResultValue))) 
+
 ## check if impute correct - n values near "mcl/√2" for each PFAS, compare to "nas"
-mclrt2 <- ucmr3_imp %>% 
+###!!! fix issues !!!!
+imp_check3 <- ucmr3%>% 
   count(
-    Contaminant, near(AnalyticalResultValue, mrlrt2))
+    Contaminant, near(AnalyticalResultValue, mrlrt2)) %>% 
+  left_join(
+    check3, 
+    by = c("Contaminant","na"), suffix = c("_orig","_imp")) %>% 
+  mutate(
+    match = n_orig == n_imp
+  )
+
+imp_check5 <- ucmr5 %>% 
+  count(
+  Contaminant, near(AnalyticalResultValue, mrlrt2))
 
 
 # Average values for each facility 
-ucmr3_imp <- ucmr3_imp %>% 
+
+
   
 
   
