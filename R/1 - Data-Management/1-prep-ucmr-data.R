@@ -11,7 +11,7 @@ source(here::here("R/0-config.R")) #??? why source config file at beginning of s
 ################################################################################
 # Does each PWS facility have a reading each year for each PFAS? A: No.
 ## Filter by individual PWS facility for unique readings of PFAS per year
-### UCMR3
+### UCMR3 ####
 check3 <- ucmr3 %>%
   mutate(
     year = year(mdy(CollectionDate))
@@ -35,14 +35,19 @@ outlier3 <- check3 %>%
   filter(
     !(n %in% c(6, 12))
   )
+nrow(outlier3)
 
 #### n NAs 
 nas_ucmr3 <- ucmr3 %>% 
   group_by(Contaminant) %>% 
   count(is.na(AnalyticalResultValue)) %>% 
   rename(is_na = "is.na(AnalyticalResultValue)")
+na <- sum(nas_ucmr3$n[nas_ucmr3$is_na == TRUE])
+t <-sum(nas_ucmr3$n)
 
-### UCMR5
+na/t # % of nas in ucmr3
+
+#### UCMR5 ####
 check5 <- ucmr5 %>%
   mutate(
     year = year(mdy(CollectionDate))
@@ -66,6 +71,16 @@ outlier5 <- check5 %>%
   filter(
     !(n %in% c(29, 58))
   )
+nrow(outlier5)
+
+#### n NAs 
+nas_ucmr5 <- ucmr5 %>% 
+  group_by(Contaminant) %>% 
+  count(is.na(AnalyticalResultValue)) %>% 
+  rename(is_na = "is.na(AnalyticalResultValue)")
+na <- sum(nas_ucmr5$n[nas_ucmr5$is_na == TRUE])
+t <-sum(nas_ucmr5$n)
+na/t # % nas in ucmr5
 
 #### n NAs 
 nas_ucmr5 <- ucmr5 %>% 
