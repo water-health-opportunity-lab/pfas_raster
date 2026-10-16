@@ -7,7 +7,7 @@
 source(here::here("R/0-config.R")) 
 
 ################################################################################
-# Investigate UCMR data 
+# Investigate UCMR and PWS data 
 ################################################################################
 # INSIGHTS FROM CODE BELOW
 ## Does each PWS facility have a reading each year for each PFAS? A: No, majority sampled over 12 month period.
@@ -123,6 +123,16 @@ pws_only3 <- pws3 %>%
   anti_join(pws5, by = "PWSID")
 pws_only5 <- pws5 %>% 
   anti_join(pws3, by ="PWSID")
+
+#### Compare PWS data and UCMR data
+pws_all_us <- pws %>% 
+  distinct(PWSID)
+pws3_all_both <- pws3 %>% 
+  semi_join(pws_all_us, by ="PWSID")
+pws3_all_only3 <- pws3 %>% 
+  anti_join(pws_all_us, by = "PWSID")
+
+  
 
 ################################################################################
 # Select and clean data - filter columns and  impute for NAs
