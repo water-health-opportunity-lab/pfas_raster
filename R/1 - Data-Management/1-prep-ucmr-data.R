@@ -1,7 +1,7 @@
 ################################################################################
 # Organization - WHO LAB
 # Project - K01 Aim 1: Surface level PFAS exposure map
-# Jordan Fischbach, Claude
+# Jordan Fischbach, Dr. Cindy Hu, Claude
 # This file imports UCMR3 and UCMR5 data and conducts manipulation, cleaning, and characterization
 ################################################################################
 source(here::here("R/0-config.R")) #??? why source config file at beginning of scripts???
@@ -9,9 +9,13 @@ source(here::here("R/0-config.R")) #??? why source config file at beginning of s
 ################################################################################
 # Investigate UCMR data 
 ################################################################################
-# Does each PWS facility have a reading each year for each PFAS? A: No.
+# INSIGHTS FROM CODE BELOW
+## Does each PWS facility have a reading each year for each PFAS? A: No, majority sampled over 12 month period.
+## What is the % of detection? A: 3 - 0.52%; 5 - 3.03% 
+## Differences in PWSID measuring in 3 vs 5? A: 4438 in both, 482 unique to 3, 5874 unique to 5
+
+#### UCMR3 ####
 ## Filter by individual PWS facility for unique readings of PFAS per year
-### UCMR3 ####
 check3 <- ucmr3 %>%
   mutate(
     year = year(mdy(CollectionDate))
@@ -107,25 +111,40 @@ ggplot(nas_ucmr5, aes(x = Contaminant, y = n, fill = is_na)) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   )
+#### Compare UCMR3 and UCMR 5 ####
+# Comparison of PWSID in each data set
+pws3 <- ucmr3 %>% 
+  distinct(PWSID)
+pws5 <- ucmr5 %>% 
+  distinct(PWSID)
+pws_both <- pws3 %>% 
+  semi_join(pws5, by = "PWSID")
+pws_only3 <- pws3 %>%
+  anti_join(pws5, by = "PWSID")
+pws_only5 <- pws5 %>% 
+  anti_join(pws3, by ="PWSID")
+
 ################################################################################
-# Clean data - filter columns and impute for NAs
+# Select and clean data - filter columns and  impute for NAs
 ################################################################################
-# Select columns 
-ucmr3 <- ucmr3 %>% 
+# Select relevant columns 
+ucmr3_select <- ucmr3 %>% 
   select(
     PWSID, Contaminant, MRL, AnalyticalResultValue)
-ucmr5 <- ucmr5 %>% 
+ucmr5_select <- ucmr5 %>% 
   select(
     PWSID, Contaminant, MRL, AnalyticalResultValue) 
 
-# Impute NA values as DL/sqrt 2 (Hu 2021 - Table 1)
-## Create table of MRL/√2 values for each PFAS
+# Impute NA values ####
+## Imputed as DL/sqrt 2 (Hu 2021 - Table 1)
+
+## 1. Create table of MRL/√2 values for each PFAS
 DL3 <- tibble(
   pfas = pfas3,
   mrl  = c(0.09, 0.01, 0.03, 0.02, 0.02, 0.04)
 ) %>% 
   mutate(
-    "mrlrt2" = mrl / sqrt(2)) %>% 
+    "mrl_sqrt2" = mrl / sqrt(2)) %>% 
   select(-mrl)
 
 DL5 <- tibble(
@@ -135,47 +154,38 @@ DL5 <- tibble(
            0.003, 0.003, 0.004, 0.003, 0.002, 0.005, 0.006, 0.008, 0.007)
 ) %>% 
   mutate(
-    "mrlrt2" = mrl / sqrt(2))%>% 
+    "mrl_sqrt2" = mrl / sqrt(2)) %>% 
   select(-mrl)
 
-
-
-## Impute mrl/√2 for NAs
-ucmr3 <- ucmr3 %>%  
+## 2. Impute mrl/√2 for NAs
+ucmr3_select <- ucmr3_select %>%  
   left_join(
     DL3, by = c("Contaminant"="pfas")) %>%
   mutate(
     na = is.na(AnalyticalResultValue),
-    AnalyticalResultValue = (if_else(
-      na, mrlrt2, AnalyticalResultValue))) 
+    AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
 
-ucmr5 <- ucmr5 %>%  
+ucmr5_select <- ucmr5_select %>%  
   left_join(
     DL5, by = c("Contaminant"="pfas")) %>%
   mutate(
     na = is.na(AnalyticalResultValue),
-    AnalyticalResultValue = (if_else(
-      na, mrlrt2, AnalyticalResultValue))) 
+    AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
 
-## check if impute correct - n values near "mcl/√2" for each PFAS, compare to "nas"
-###!!! fix issues !!!!
-imp_check3 <- ucmr3%>% 
+## 3. check if impute correct
+# N values near "mcl/√2" for each PFAS, compare to "nas"
+## Manually checked values - 
+imp_check3 <- ucmr3_select%>% 
   count(
-    Contaminant, near(AnalyticalResultValue, mrlrt2)) %>% 
-  left_join(
-    check3, 
-    by = c("Contaminant","na"), suffix = c("_orig","_imp")) %>% 
-  mutate(
-    match = n_orig == n_imp
-  )
-
-imp_check5 <- ucmr5 %>% 
+    Contaminant, na = near(AnalyticalResultValue, mrl_sqrt2))
+imp_check5 <- ucmr5_select %>% 
   count(
-  Contaminant, near(AnalyticalResultValue, mrlrt2))
+    Contaminant, na = near(AnalyticalResultValue, mrl_sqrt2))
 
-
-# Average values for each facility 
-
+# Average values for each facility ####
+ucmr3_averaged_values <- ucmr_select %>% 
+  
+  
 
   
 
