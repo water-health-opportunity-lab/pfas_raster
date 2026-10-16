@@ -4,7 +4,7 @@
 # Jordan Fischbach, Dr. Cindy Hu, Claude
 # This file imports UCMR3 and UCMR5 data and conducts manipulation, cleaning, and characterization
 ################################################################################
-source(here::here("R/0-config.R")) #??? why source config file at beginning of scripts???
+source(here::here("R/0-config.R")) 
 
 ################################################################################
 # Investigate UCMR data 
@@ -164,6 +164,7 @@ ucmr3_select <- ucmr3_select %>%
   mutate(
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
+fwrite(ucmr3_select, here("data", "intermediate", "ucmr3_pfas_select_columns"))
 
 ucmr5_select <- ucmr5_select %>%  
   left_join(
@@ -171,20 +172,34 @@ ucmr5_select <- ucmr5_select %>%
   mutate(
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
+fwrite(ucmr5_select, here("data", "intermediate", "ucmr3_pfas_select_columns"))
 
 ## 3. check if impute correct
 # N values near "mcl/√2" for each PFAS, compare to "nas"
 ## Manually checked values - 
 imp_check3 <- ucmr3_select%>% 
   count(
-    Contaminant, na = near(AnalyticalResultValue, mrl_sqrt2))
+    Contaminant, detect = near(AnalyticalResultValue, mrl_sqrt2))
 imp_check5 <- ucmr5_select %>% 
   count(
-    Contaminant, na = near(AnalyticalResultValue, mrl_sqrt2))
+    Contaminant, detect = near(AnalyticalResultValue, mrl_sqrt2))
 
 # Average values for each facility ####
-ucmr3_averaged_values <- ucmr_select %>% 
-  
+ucmr3_averaged_values <- ucmr3_select %>% 
+  group_by(PWSID, Contaminant) %>% 
+  summarise(
+    mean_value = mean(AnalyticalResultValue),
+    .groups = "drop"
+  )
+fwrite(ucmr3_averaged_values, here("data", "intermediate", "ucmr3_averaged_pfas_values"))
+
+ucmr5_averaged_values <-ucmr5_select %>% 
+  group_by(PWSID, Contaminant) %>% 
+  summarise(
+    mean_value = mean(AnalyticalResultValue),
+    .groups = "drop"
+  )
+fwrite(ucmr5_averaged_values, here("data", "intermediate", "ucmr5_averaged_pfas_values"))
   
 
   
