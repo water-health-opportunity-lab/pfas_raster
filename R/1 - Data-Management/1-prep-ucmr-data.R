@@ -131,6 +131,10 @@ pws3_all_both <- pws3 %>%
   semi_join(pws_all_us, by ="PWSID")
 pws3_all_only3 <- pws3 %>% 
   anti_join(pws_all_us, by = "PWSID")
+pws5_all_both <- pws5 %>% 
+  semi_join(pws_all_us, by = "PWSID")
+pws5_all_only5 <- pws5 %>% 
+  anti_join(pws_all_us, by = "PWSID")
 
   
 
