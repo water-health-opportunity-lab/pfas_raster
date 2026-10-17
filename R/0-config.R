@@ -4,11 +4,10 @@
 # Jordan Fischbach, Dr. Cindy Hu
 # Configuration file for global variables, data upload, and file path specifications
 ################################################################################
-# Restore r environment
+# Restore r environment 
 renv::restore()
 ################################################################################
-
-# Load libraries
+#Load libraries
 library(here)
 library(renv)
 
@@ -24,11 +23,7 @@ library(ggplot2)
 # Global variables
 ## PFAS included in UCMR3 and UCMR5 respectively (all PFAS in 3 present in 5)
 pfas3 <- c("PFBS","PFHpA","PFHxS","PFNA","PFOA","PFOS")
-pfas5 <- c("PFOS", "PFOA", "HFPO-DA", "PFHxS", "PFNA", "PFBS", "PFBA", "PFHxA",
-             "PFDA", "6:2 FTS", "8:2 FTS", "4:2 FTS", "ADONA", "11Cl-PF3OUdS",
-             "9Cl-PF3ONS", "NFDHA", "PFEESA", "PFMPA", "PFMBA", "PFDoA", "PFHpS",
-             "PFHpA", "PFPeS", "PFPeA", "PFUnA", "NEtFOSAA", "NMeFOSAA", "PFTA",
-             "PFTrDA")
+pfas5 <- c("PFOS", "PFOA", "HFPO-DA", "PFHxS", "PFNA", "PFBS", "PFBA", "PFHxA", "PFDA", "6:2 FTS", "8:2 FTS", "4:2 FTS", "ADONA", "11Cl-PF3OUdS", "9Cl-PF3ONS", "NFDHA", "PFEESA", "PFMPA", "PFMBA", "PFDoA", "PFHpS", "PFHpA", "PFPeS", "PFPeA", "PFUnA", "NEtFOSAA", "NMeFOSAA", "PFTA", "PFTrDA")
 
 
 ################################################################################
@@ -58,8 +53,11 @@ fwrite(ucmr5, here("data", "intermediate", "ucmr5_pfas_raw"))
 ################################################################################
 # Import EPA PWIS Map
 ################################################################################
-## Version 3.0 downloaded (last updated: 03/17/2026; accessed: 10/09/2026)
+## Version 3.0 downloaded from github (https://github.com/USEPA/ORD_SAB_Model/tree/main/Output_Data) (last updated: 03/17/2026; accessed: 10/09/2026)
 
-pws <- read_sf(here("data", "raw", "EPA_CWS_V1"))
-
+pws <- read_sf(here("data", "raw", "EPA_CWS_V1")) %>% 
+  select(
+    PWSID, geometry
+  )
+write_sf(pws, here("data", "intermediate", "epa_cws_v1.rds"))
 

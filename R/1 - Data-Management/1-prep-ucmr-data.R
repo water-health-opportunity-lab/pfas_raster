@@ -5,7 +5,10 @@
 # This file imports UCMR3 and UCMR5 data and conducts manipulation, cleaning, and characterization
 ################################################################################
 source(here::here("R/0-config.R")) 
-
+################################################################################
+# Load relevant raw and intermediate data sets (see 0-config)
+ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw"))
+ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
 ################################################################################
 # Investigate UCMR and PWS data 
 ################################################################################
@@ -14,7 +17,7 @@ source(here::here("R/0-config.R"))
 ## What is the % of detection? A: 3 - 0.52%; 5 - 3.03% 
 ## Differences in PWSID measuring in 3 vs 5? A: 4438 in both, 482 unique to 3, 5874 unique to 5
 
-#### UCMR3 ####
+# UCMR3 ####
 ## Filter by individual PWS facility for unique readings of PFAS per year
 check3 <- ucmr3 %>%
   mutate(
@@ -51,7 +54,7 @@ t <-sum(nas_ucmr3$n)
 
 na/t # % of nas in ucmr3
 
-#### UCMR5 ####
+# UCMR5 ####
 check5 <- ucmr5 %>%
   mutate(
     year = year(mdy(CollectionDate))
@@ -111,7 +114,7 @@ ggplot(nas_ucmr5, aes(x = Contaminant, y = n, fill = is_na)) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   )
-#### Compare UCMR3 and UCMR 5 ####
+# Compare UCMR3 and UCMR 5 ####
 # Comparison of PWSID in each data set
 pws3 <- ucmr3 %>% 
   distinct(PWSID)
@@ -141,7 +144,7 @@ pws5_all_only5 <- pws5 %>%
 ################################################################################
 # Select and clean data - filter columns and  impute for NAs
 ################################################################################
-# Select relevant columns 
+# Select relevant columns ####
 ucmr3_select <- ucmr3 %>% 
   select(
     PWSID, Contaminant, MRL, AnalyticalResultValue)
@@ -178,7 +181,7 @@ ucmr3_select <- ucmr3_select %>%
   mutate(
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
-fwrite(ucmr3_select, here("data", "intermediate", "ucmr3_pfas_select_columns"))
+
 
 ucmr5_select <- ucmr5_select %>%  
   left_join(
@@ -186,7 +189,6 @@ ucmr5_select <- ucmr5_select %>%
   mutate(
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
-fwrite(ucmr5_select, here("data", "intermediate", "ucmr3_pfas_select_columns"))
 
 ## 3. check if impute correct
 # N values near "mcl/√2" for each PFAS, compare to "nas"
