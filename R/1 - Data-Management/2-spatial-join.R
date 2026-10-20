@@ -12,5 +12,10 @@ ucmr3 <- fread(here("data", "intermediate", "ucmr3_averaged_pfas_values"))
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_averaged_pfas_values"))
 pws <- read_sf(here("data", "intermediate", "epa_pws.shp"))
 ################################################################################
+# Join ucmr data with pws shape file 
+ucmr3_geom <- ucmr3 %>% 
+  left_join(
+    pws, by = "PWSID"
+  )
 
 ################################################################################

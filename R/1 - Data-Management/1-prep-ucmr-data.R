@@ -14,8 +14,8 @@ ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
 ################################################################################
 # INSIGHTS FROM CODE BELOW
 ## Does each PWS facility have a reading each year for each PFAS? A: No, majority sampled over 12 month period.
-## What is the % of detection? A: 3 - 0.52%; 5 - 3.03% 
-## Differences in PWSID measuring in 3 vs 5? A: 4438 in both, 482 unique to 3, 5874 unique to 5
+## What is the % of detection? A: ucmr3 - 0.52%; ucmr5 - 3.03% 
+## Differences in PWSID names measuring in 3 vs 5? A: 4438 shared PWSID names in both, 482 unique to 3, 5874 unique to 5
 
 # UCMR3 ####
 ## Filter by individual PWS facility for unique readings of PFAS per year
@@ -116,6 +116,9 @@ ggplot(nas_ucmr5, aes(x = Contaminant, y = n, fill = is_na)) +
   )
 # Compare UCMR3 and UCMR 5 ####
 # Comparison of PWSID in each data set
+ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw")) # @cindy ease of use for me, is this best practice?
+ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
+
 pws3 <- ucmr3 %>% 
   distinct(PWSID)
 pws5 <- ucmr5 %>% 
@@ -139,6 +142,9 @@ pws5_all_both <- pws5 %>%
 pws5_all_only5 <- pws5 %>% 
   anti_join(pws_all_us, by = "PWSID")
 
+fwrite(pws_all_us, here("data", "intermediate", "epa_all_pwsids"))
+fwrite(pws3_all_only3, here("data", "intermediate", "ucmr3_pwsid_name_different"))
+fwrite(pws5_all_only5, here("data", "intermediate", "ucmr5_pwsid_name_different"))
   
 
 ################################################################################
@@ -182,7 +188,6 @@ ucmr3_select <- ucmr3_select %>%
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
 
-
 ucmr5_select <- ucmr5_select %>%  
   left_join(
     DL5, by = c("Contaminant"="pfas")) %>%
@@ -192,7 +197,6 @@ ucmr5_select <- ucmr5_select %>%
 
 ## 3. check if impute correct
 # N values near "mcl/√2" for each PFAS, compare to "nas"
-## Manually checked values - 
 imp_check3 <- ucmr3_select%>% 
   count(
     Contaminant, detect = near(AnalyticalResultValue, mrl_sqrt2))
@@ -205,6 +209,7 @@ ucmr3_averaged_values <- ucmr3_select %>%
   group_by(PWSID, Contaminant) %>% 
   summarise(
     mean_value = mean(AnalyticalResultValue),
+    na_count = sum(na),
     .groups = "drop"
   )
 fwrite(ucmr3_averaged_values, here("data", "intermediate", "ucmr3_averaged_pfas_values"))
@@ -213,6 +218,7 @@ ucmr5_averaged_values <-ucmr5_select %>%
   group_by(PWSID, Contaminant) %>% 
   summarise(
     mean_value = mean(AnalyticalResultValue),
+    na_count = sum(na),
     .groups = "drop"
   )
 fwrite(ucmr5_averaged_values, here("data", "intermediate", "ucmr5_averaged_pfas_values"))
