@@ -2,20 +2,13 @@
 # Organization - WHO LAB
 # Project - K01 Aim 1: Surface level PFAS exposure map
 # Jordan Fischbach, Dr. Cindy Hu, Claude
-# This file joins UCMR3 and UCMR5 data with PWS shapefile
+# This file creates individual raster files for each PFAS
 ################################################################################
 source(here::here("R/0-config.R")) 
-
 ################################################################################
 # Load relevant raw and intermediate data sets (see 0-config)
-ucmr3 <- fread(here("data", "intermediate", "ucmr3_averaged_pfas_values"))
-ucmr5 <- fread(here("data", "intermediate", "ucmr5_averaged_pfas_values"))
-pws <- read_sf(here("data", "intermediate", "epa_pws.shp"))
+ucmr3 <- fread(here("data", "intermediate", "ucmr3_geom"))
+ucmr5 <- fread(here("data", "intermediate", "ucmr5_geom"))
+pws <- readRDS(here("data", "intermediate", "epa_pws.rds"))
 ################################################################################
-# Join ucmr data with pws shape file 
-ucmr3_geom <- ucmr3 %>% 
-  left_join(
-    pws, by = "PWSID"
-  )
 
-################################################################################
