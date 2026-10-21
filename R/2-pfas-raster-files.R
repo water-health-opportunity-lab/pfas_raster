@@ -11,26 +11,29 @@ ucmr3_averaged_pfas_values <- fread(here("data", "intermediate", "ucmr3_averaged
 ucmr5_averaged_pfas_values <- fread(here("data", "intermediate", "ucmr5_averaged_pfas_values"))
 pws <- readRDS(here("data", "intermediate", "epa_pws.rds"))
 ################################################################################
+# Create Raster and shapefiles for each PFAS for UCMR3 and UCMR5
+################################################################################
+# Prepare variables for function
+# Create projection for raster files - CONUS, transformed to Conus Abers equal area projeccion
+conus <- tigris::states(cb = TRUE, year = 2022) %>% 
+  st_crop(c(xmin = -125.0017, ymin = 20, xmax = -66.9346, ymax = 49.3844)) %>% #Soo-Yeon
+  st_transform(5070) 
+
+# CONUS 1km x 1km template to be filled bellow 
+template <- rast(vect(conus),  resolution = 1000)
+
+# Keep only systems in CONUS
+pws_conus <- pws %>% 
+  st_transform(5070) %>% 
+  st_filter(conus)
+
 # 1. Create function: Rasterize UCMR data ------------------------------------
 
 rasterize_ucmr_pfas <- function(data, 
                                 pws, 
                                 pfas_list,
                                 ucmr_round) {
-  
-  # Create projection for raster files - CONUS, transformed to Conus Abers equal area projeccion
-  conus <- tigris::states(cb = TRUE, year = 2022) %>% 
-    st_crop(c(xmin = -125.0017, ymin = 20, xmax = -66.9346, ymax = 49.3844)) %>% #Soo-Yeon
-    st_transform(5070)
-    
-  # CONUS 1km x 1km template for rasterization
-  template <- rast(vect(conus),  resolution = 1000)
-  
-  # Keep only systems in CONUS
-  pws_conus <- pws %>% 
-    st_transfomr(5070) %>% 
-    st_fiter(conus)
-  
+
   for (i in pfas_list) {
     # Status update
     print(paste("processing pfas", i))
@@ -47,7 +50,7 @@ rasterize_ucmr_pfas <- function(data,
     pfas_sf %>% 
       vect() %>% 
       rasterize(template, field = "mean", fun = "max") %>% 
-      writeRaster(here("data", "final", paste0(file_stub, ".tif")), overwrite = TRUE)
+      writeRaster(here("data", "final", paste0("ucmr", ucmr_round, "_", str_replace_all(i, "[: ]", "_"), "_", "rast.tif")), overwrite = TRUE)
     
   }
 }
@@ -55,7 +58,7 @@ rasterize_ucmr_pfas <- function(data,
 # 2a. Create UCMR 3 shape files -----------------------------------------------
 rasterize_ucmr_pfas(
   data = ucmr3_averaged_pfas_values,
-  pws = pws, 
+  pws = pws_conus, 
   pfas_list = pfas3,
   ucmr_round = 3
   )
@@ -63,7 +66,7 @@ rasterize_ucmr_pfas(
 # 2b. Create UCMR 5 shape files -----------------------------------------------
 rasterize_ucmr_pfas(
   data = ucmr5_averaged_pfas_values,
-  pws = pws, 
+  pws = pws_conus, 
   pfas_list = pfas5,
   ucmr_round = 5
 )
