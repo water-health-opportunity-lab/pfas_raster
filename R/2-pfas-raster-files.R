@@ -17,7 +17,12 @@ rasterize_ucmr_pfas <- function(data,
                                 pws, 
                                 pfas_list,
                                 ucmr_round) {
-  # Create projection
+  
+  # Create projection for raster files
+  us_outline <- tigris::states(cb = TRUE, year = 2022) %>% 
+    st_transform(4269)
+  
+  
   
   for (i in pfas_list) {
     # Status update
