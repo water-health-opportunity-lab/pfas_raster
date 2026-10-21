@@ -9,19 +9,23 @@ source(here::here("R/0-config.R"))
 # Load relevant raw and intermediate data sets (see 0-config)
 ucmr3 <- fread(here("data", "intermediate", "ucmr3_averaged_pfas_values"))
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_averaged_pfas_values"))
-pws <- read_sf(here("data", "intermediate", "epa_pws.rds"))
+pws <- readRDS(here("data", "intermediate", "epa_pws.rds"))
+################################################################################
 ################################################################################
 # Join ucmr data with pws shape file 
+################################################################################
 ucmr3_geom <- ucmr3 %>% 
   left_join(
     pws, by = "PWSID"
   )
+
 saveRDS(ucmr3_geom, here("data/intermediate/ucmr3_geom.rds"))
 
 ucmr5_geom <- ucmr5 %>% 
   left_join(
     pws, by = "PWSID"
   )
+
 saveRDS(ucmr5_geom, here("data/intermediate/ucmr5_geom.rds"))
 
 ## PWSID missing geometries 
@@ -35,4 +39,3 @@ x5 <- ucmr5_geom %>%
   )
 
 ################################################################################
-# Create

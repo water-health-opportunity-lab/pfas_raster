@@ -208,16 +208,16 @@ imp_check5 <- ucmr5_select %>%
 ucmr3_averaged_values <- ucmr3_select %>% 
   group_by(PWSID, Contaminant) %>% 
   summarise(
-    mean_value = mean(AnalyticalResultValue),
+    mean = mean(AnalyticalResultValue),
     na_count = sum(na),
     .groups = "drop"
-  )
+  ) 
 fwrite(ucmr3_averaged_values, here("data", "intermediate", "ucmr3_averaged_pfas_values"))
 
-ucmr5_averaged_values <-ucmr5_select %>% 
+ucmr5_averaged_values <- ucmr5_select %>% 
   group_by(PWSID, Contaminant) %>% 
   summarise(
-    mean_value = mean(AnalyticalResultValue),
+    mean = mean(AnalyticalResultValue),
     na_count = sum(na),
     .groups = "drop"
   )
