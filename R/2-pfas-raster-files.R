@@ -1,8 +1,8 @@
 ################################################################################
-# Organization - WHO LAB
-# Project - K01 Aim 1: Surface level PFAS exposure map
-# Jordan Fischbach, Dr. Cindy Hu, Claude
-# This file creates individual raster files for each PFAS
+# Organization: WHO LAB
+# Project: K01 Aim 1: Surface level PFAS exposure map
+# Author: Jordan Fischbach, Claude
+# Purpose: This file creates individual shapefiles and 1 km raster files for each PFAS
 ################################################################################
 source(here::here("R/0-config.R")) 
 ################################################################################
@@ -16,19 +16,27 @@ pws <- readRDS(here("data", "intermediate", "epa_pws.rds"))
 rasterize_ucmr_pfas <- function(data, 
                                 pws, 
                                 pfas_list,
-                                ucmr_round){
+                                ucmr_round) {
+  # Create projection
+  
   for (i in pfas_list) {
+    # Status update
     print(paste("processing pfas", i))
-    data %>% 
+    
+    #1. Create shapefile
+    pfas_sf <- data %>% 
       filter(Contaminant == i) %>% 
       left_join(pws, by = "PWSID") %>% 
       st_as_sf() %>% 
       rename(pfas = Contaminant) %>% 
-      write_sf(here("data/final/", paste0("ucmr", ucmr_round, "_", str_replace_all(i, "[: ]", "_"), "_", "ave_values.shp")))
+      write_sf(here("data/final/", paste0("ucmr", ucmr_round, "_", str_replace_all(i, "[: ]", "_"), "_", "ave_values.shp"))) 
+    
+    #2. Create raster file
+    pfas_sf %>% 
+      vect()
     
   }
 }
-
 
 # 2a. Create UCMR 3 shape files -----------------------------------------------
 rasterize_ucmr_pfas(

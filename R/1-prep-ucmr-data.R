@@ -1,23 +1,27 @@
 ################################################################################
-# Organization - WHO LAB
-# Project - K01 Aim 1: Surface level PFAS exposure map
-# Jordan Fischbach, Dr. Cindy Hu, Claude
-# This file imports UCMR3 and UCMR5 data and conducts manipulation, cleaning, and characterization
+# Organization: WHO LAB
+# Project: K01 Aim 1: Surface level PFAS exposure map
+# Author(s): Jordan Fischbach, Claude
+# Purpose: Import UCMR3 and UCMR5 data and conduct manipulation, cleaning, and exploratory data characterization
 ################################################################################
 source(here::here("R/0-config.R")) 
 ################################################################################
 # Load relevant raw and intermediate data sets (see 0-config)
 ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw"))
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
+
 ################################################################################
 # Investigate UCMR and PWS data 
 ################################################################################
-# INSIGHTS FROM CODE BELOW
+# INSIGHTS FROM CODE BELOW ------------------------------------------------
 ## Does each PWS facility have a reading each year for each PFAS? A: No, majority sampled over 12 month period.
-## What is the % of detection? A: ucmr3 - 0.52%; ucmr5 - 3.03% 
-## Differences in PWSID names measuring in 3 vs 5? A: 4438 shared PWSID names in both, 482 unique to 3, 5874 unique to 5
 
-# UCMR3 ####
+## What is the % of detection for all PFAS combined? A: ucmr3 - 0.52%; ucmr5 - 3.03% 
+
+## Differences in PWSID names measuring in 3 vs 5? A: 4438 shared PWSID names in both, 482 unique to 3, 5874 unique to 5
+## Differences in PWSID names measuring in 3 and 5 vs EPA PWS .shp file? A: 3 - 4639 shared, 281 diff; 5 - 9769 shared, 543 diff
+
+# UCMR3 -------------------------------------------------------------------
 ## Filter by individual PWS facility for unique readings of PFAS per year
 check3 <- ucmr3 %>%
   mutate(
@@ -54,7 +58,7 @@ t <-sum(nas_ucmr3$n)
 
 na/t # % of nas in ucmr3
 
-# UCMR5 ####
+# UCMR5 -------------------------------------------------------------------
 check5 <- ucmr5 %>%
   mutate(
     year = year(mdy(CollectionDate))
@@ -114,8 +118,7 @@ ggplot(nas_ucmr5, aes(x = Contaminant, y = n, fill = is_na)) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top"
   )
-# Compare UCMR3 and UCMR 5 ####
-# Comparison of PWSID in each data set
+# Comparison of PWSID in each data set ------------------------------------
 ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw")) # @cindy ease of use for me, is this best practice?
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
 
@@ -123,7 +126,7 @@ pws3 <- ucmr3 %>%
   distinct(PWSID)
 pws5 <- ucmr5 %>% 
   distinct(PWSID)
-pws_both <- pws3 %>% 
+pws_both_3_5 <- pws3 %>% 
   semi_join(pws5, by = "PWSID")
 pws_only3 <- pws3 %>%
   anti_join(pws5, by = "PWSID")
@@ -147,10 +150,11 @@ fwrite(pws3_all_only3, here("data", "intermediate", "ucmr3_pwsid_name_different"
 fwrite(pws5_all_only5, here("data", "intermediate", "ucmr5_pwsid_name_different"))
   
 
+
 ################################################################################
 # Select and clean data - filter columns and  impute for NAs
 ################################################################################
-# Select relevant columns ####
+# Select relevant columns  ------------------------------------------------
 ucmr3_select <- ucmr3 %>% 
   select(
     PWSID, Contaminant, MRL, AnalyticalResultValue)
@@ -158,7 +162,7 @@ ucmr5_select <- ucmr5 %>%
   select(
     PWSID, Contaminant, MRL, AnalyticalResultValue) 
 
-# Impute NA values ####
+# Impute NA values --------------------------------------------------------
 ## Imputed as DL/sqrt 2 (Hu 2021 - Table 1)
 
 ## 1. Create table of MRL/√2 values for each PFAS
@@ -204,7 +208,11 @@ imp_check5 <- ucmr5_select %>%
   count(
     Contaminant, detect = near(AnalyticalResultValue, mrl_sqrt2))
 
-# Average values for each facility ####
+################################################################################
+# Average values for each facility 
+################################################################################
+# UCMR3 -------------------------------------------------------------------
+
 ucmr3_averaged_values <- ucmr3_select %>% 
   group_by(PWSID, Contaminant) %>% 
   summarise(
@@ -214,6 +222,7 @@ ucmr3_averaged_values <- ucmr3_select %>%
   ) 
 fwrite(ucmr3_averaged_values, here("data", "intermediate", "ucmr3_averaged_pfas_values"))
 
+# UCMR5 -------------------------------------------------------------------
 ucmr5_averaged_values <- ucmr5_select %>% 
   group_by(PWSID, Contaminant) %>% 
   summarise(

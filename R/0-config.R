@@ -1,8 +1,8 @@
 ################################################################################
-# Organization - WHO LAB
-# Project - K01 Aim 1: Surface level PFAS exposure map
-# Jordan Fischbach, Dr. Cindy Hu
-# Configuration file for global variables, data upload, and file path specifications
+# Organization: WHO LAB
+# Project: K01 Aim 1: Surface level PFAS exposure map
+# Author(s): Jordan Fischbach
+# Purpose: Configuration file for global variables, data upload, and file path specifications
 ################################################################################
 # Restore r environment 
 renv::restore()
@@ -17,6 +17,7 @@ library(lubridate)
 
 library(sf)
 library(terra)
+library(tigris)
 
 library(ggplot2)
 
@@ -39,8 +40,6 @@ ucmr3 <-  fread(file = here("data", "raw", "ucmr3", "UCMR3_All.txt")) %>%
     Contaminant %in% pfas3)
 fwrite(ucmr3, here("data", "intermediate", "ucmr3_pfas_raw"))
 
-##fwrite(ucmr3, here("data", "intermediate", "ucmr3_pfas"))
-
 ## UCMR5 data downloaded from https://www.epa.gov/dwucmr/occurrence-data-unregulated-contaminant-monitoring-rule
 ## downloaded 10/16/2026 - last file update 10/15/2026
 ### Click "UCMR 5 Occurrence Data Text Files (zip)" under "UCMR 5 (2023-2025) Occurrence Data" to download
@@ -57,4 +56,9 @@ fwrite(ucmr5, here("data", "intermediate", "ucmr5_pfas_raw"))
 pws <- read_sf(here("data", "raw", "EPA_CWS_V1")) %>% 
   select(PWSID, geometry)
 saveRDS(pws, here("data", "intermediate", "epa_pws.rds"))
+
+################################################################################
+# Import US shapefile 
+################################################################################
+
 
