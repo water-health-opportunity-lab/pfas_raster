@@ -29,7 +29,7 @@ pws_conus <- pws %>%
 
 # 1. Create function: Rasterize UCMR data ------------------------------------
 
-rasterize_ucmr_pfas <- function(data, 
+rasterize_ucmr_pfas <- function(ucmr_data, 
                                 pws, 
                                 pfas_list,
                                 ucmr_round) {
@@ -39,7 +39,7 @@ rasterize_ucmr_pfas <- function(data,
     print(paste("processing pfas", i))
     
     #1. Create shapefile
-    pfas_sf <- data %>% 
+    pfas_sf <- ucmr_data %>% 
       filter(Contaminant == i) %>% 
       left_join(pws, by = "PWSID") %>% 
       st_as_sf() %>% 
@@ -57,7 +57,7 @@ rasterize_ucmr_pfas <- function(data,
 
 # 2a. Create UCMR 3 shape files -----------------------------------------------
 rasterize_ucmr_pfas(
-  data = ucmr3_averaged_pfas_values,
+  ucmr_data = ucmr3_averaged_pfas_values,
   pws = pws_conus, 
   pfas_list = pfas3,
   ucmr_round = 3
@@ -65,7 +65,7 @@ rasterize_ucmr_pfas(
 
 # 2b. Create UCMR 5 shape files -----------------------------------------------
 rasterize_ucmr_pfas(
-  data = ucmr5_averaged_pfas_values,
+  ucmr_data = ucmr5_averaged_pfas_values,
   pws = pws_conus, 
   pfas_list = pfas5,
   ucmr_round = 5

@@ -7,7 +7,13 @@
 source(here::here("R/0-config.R")) 
 ################################################################################
 # UCMR 3 ------------------------------------------------------------------
-ggplot(
-  data = ucmr5_
-)
+ucmr3_pfoa_sf <- read_sf(here("data", "final", "ucmr3_PFOA_ave_values.shp"))
+ucmr5_pfoa_sf <- read_sf(here("data", "final", "ucmr5_PFOA_ave_values.shp"))
+
+ggplot(ucmr3_pfoa_sf) +
+  geom_sf(aes(fill = mean), color = NA)
+
+ggplot(ucmr5_pfoa_sf) +
+  geom_sf(aes(fill = mean), color = NA)
+
 
