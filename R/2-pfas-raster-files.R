@@ -18,11 +18,18 @@ rasterize_ucmr_pfas <- function(data,
                                 pfas_list,
                                 ucmr_round) {
   
-  # Create projection for raster files
-  us_outline <- tigris::states(cb = TRUE, year = 2022) %>% 
-    st_transform(4269)
+  # Create projection for raster files - CONUS, transformed to Conus Abers equal area projeccion
+  conus <- tigris::states(cb = TRUE, year = 2022) %>% 
+    st_crop(c(xmin = -125.0017, ymin = 20, xmax = -66.9346, ymax = 49.3844)) %>% #Soo-Yeon
+    st_transform(5070)
+    
+  # CONUS 1km x 1km template for rasterization
+  template <- rast(vect(conus),  resolution = 1000)
   
-  
+  # Keep only systems in CONUS
+  pws_conus <- pws %>% 
+    st_transfomr(5070) %>% 
+    st_fiter(conus)
   
   for (i in pfas_list) {
     # Status update
@@ -38,7 +45,9 @@ rasterize_ucmr_pfas <- function(data,
     
     #2. Create raster file
     pfas_sf %>% 
-      vect()
+      vect() %>% 
+      rasterize(template, field = "mean", fun = "max") %>% 
+      writeRaster(here("data", "final", paste0(file_stub, ".tif")), overwrite = TRUE)
     
   }
 }
