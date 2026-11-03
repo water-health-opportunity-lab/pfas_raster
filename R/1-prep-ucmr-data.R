@@ -218,6 +218,7 @@ ucmr3_averaged_values <- ucmr3_select %>%
   summarise(
     mean = mean(AnalyticalResultValue),
     na_count = sum(na),
+    total_count = n(),
     .groups = "drop"
   ) 
 fwrite(ucmr3_averaged_values, here("data", "intermediate", "ucmr3_averaged_pfas_values"))
@@ -228,6 +229,7 @@ ucmr5_averaged_values <- ucmr5_select %>%
   summarise(
     mean = mean(AnalyticalResultValue),
     na_count = sum(na),
+    total_count = n(),
     .groups = "drop"
   )
 fwrite(ucmr5_averaged_values, here("data", "intermediate", "ucmr5_averaged_pfas_values"))
