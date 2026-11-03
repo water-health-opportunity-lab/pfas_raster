@@ -18,6 +18,7 @@ library(lubridate)
 library(sf)
 library(terra)
 library(tigris)
+options(tigris_use_cache = TRUE)
 
 library(ggplot2)
 
@@ -63,3 +64,11 @@ saveRDS(pws, here("data", "intermediate", "epa_pws.rds"))
 # Shape files of UCMR 3 and 5 ZIP codes corresponding to PWSID
 zip3 <- fread(here("data/raw/ucmr3/UCMR3_ZIPCodes.txt"))
 zip5 <- fread(here("data/raw/ucmr5/UCMR5_ZIPCodes.txt"))
+
+# Shape files of ZCTAs to merge
+zcta3 <- tigris::zctas(year = 2013) %>% 
+  rename(ZIP = matches("^ZCTA5CE")) %>% 
+  select(ZIP)
+zcta5 <- tigris::zctas(year = 2023) %>% 
+  rename(ZIP = matches("^ZCTA5CE")) %>% 
+  select(ZIP)
