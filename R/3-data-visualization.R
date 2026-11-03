@@ -10,6 +10,8 @@ source(here::here("R/0-config.R"))
 ucmr3_pfoa_sf <- read_sf(here("data", "final", "ucmr3_PFOA_ave_values.shp"))
 ucmr5_pfoa_sf <- read_sf(here("data", "final", "ucmr5_PFOA_ave_values.shp"))
 
+ucmr3_pfoa_rast <- rast(here("data/final/ucmr3_PFOA_rast.tif"))
+
 ggplot(ucmr3_pfoa_sf) +
   geom_sf(aes(fill = mean), color = NA)
 

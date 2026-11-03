@@ -58,7 +58,8 @@ pws <- read_sf(here("data", "raw", "EPA_CWS_V1")) %>%
 saveRDS(pws, here("data", "intermediate", "epa_pws.rds"))
 
 ################################################################################
-# Import US shapefile 
+# Import ZIP codes
 ################################################################################
-
-
+# Shape files of UCMR 3 and 5 ZIP codes corresponding to PWSID
+zip3 <- fread(here("data/raw/ucmr3/UCMR3_ZIPCodes.txt"))
+zip5 <- fread(here("data/raw/ucmr5/UCMR5_ZIPCodes.txt"))

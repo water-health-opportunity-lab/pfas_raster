@@ -7,14 +7,14 @@
 source(here::here("R/0-config.R")) 
 ################################################################################
 # Load relevant raw and intermediate data sets (see 0-config)
-ucmr3_averaged_pfas_values <- fread(here("data", "intermediate", "ucmr3_averaged_pfas_values"))
-ucmr5_averaged_pfas_values <- fread(here("data", "intermediate", "ucmr5_averaged_pfas_values"))
+ucmr3_averaged_values <- fread(here("data", "intermediate", "ucmr3_averaged_values"))
+ucmr5_averaged_values <- fread(here("data", "intermediate", "ucmr5_averaged_values"))
 pws <- readRDS(here("data", "intermediate", "epa_pws.rds"))
 ################################################################################
 # Create Raster and shapefiles for each PFAS for UCMR3 and UCMR5
 ################################################################################
 # Prepare variables for function
-# Create projection for raster files - CONUS, transformed to Conus Abers equal area projeccion
+# Create projection for raster files - CONUS, transformed to Albers equal area conic projecion
 conus <- tigris::states(cb = TRUE, year = 2022) %>% 
   st_crop(c(xmin = -125.0017, ymin = 20, xmax = -66.9346, ymax = 49.3844)) %>% #Soo-Yeon
   st_transform(5070) 
@@ -22,7 +22,7 @@ conus <- tigris::states(cb = TRUE, year = 2022) %>%
 # CONUS 1km x 1km template to be filled bellow 
 template <- rast(vect(conus),  resolution = 1000)
 
-# Keep only systems in CONUS
+# Keep only PWS in CONUS
 pws_conus <- pws %>% 
   st_transform(5070) %>% 
   st_filter(conus)
@@ -45,7 +45,7 @@ rasterize_ucmr_pfas <- function(ucmr_data,
       st_as_sf() %>% 
       rename(pfas = Contaminant) %>% 
       write_sf(here("data/final/", paste0("ucmr", ucmr_round, "_", str_replace_all(i, "[: ]", "_"), "_", "ave_values.shp"))) 
-    
+    for 
     #2. Create raster file
     pfas_sf %>% 
       vect() %>% 
@@ -57,7 +57,7 @@ rasterize_ucmr_pfas <- function(ucmr_data,
 
 # 2a. Create UCMR 3 shape files -----------------------------------------------
 rasterize_ucmr_pfas(
-  ucmr_data = ucmr3_averaged_pfas_values,
+  ucmr_data = ucmr3_averaged_values,
   pws = pws_conus, 
   pfas_list = pfas3,
   ucmr_round = 3
@@ -65,7 +65,7 @@ rasterize_ucmr_pfas(
 
 # 2b. Create UCMR 5 shape files -----------------------------------------------
 rasterize_ucmr_pfas(
-  ucmr_data = ucmr5_averaged_pfas_values,
+  ucmr_data = ucmr5_averaged_values,
   pws = pws_conus, 
   pfas_list = pfas5,
   ucmr_round = 5

@@ -191,6 +191,7 @@ ucmr3_select <- ucmr3_select %>%
   mutate(
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
+fwrite(ucmr3_select, here("data/intermediate/ucmr3_select"))
 
 ucmr5_select <- ucmr5_select %>%  
   left_join(
@@ -198,6 +199,7 @@ ucmr5_select <- ucmr5_select %>%
   mutate(
     na = is.na(AnalyticalResultValue),
     AnalyticalResultValue = (if_else(na, mrl_sqrt2, AnalyticalResultValue))) 
+fwrite(ucmr5_select, here("data/intermediate/ucmr5_select"))
 
 ## 3. check if impute correct
 # N values near "mcl/√2" for each PFAS, compare to "nas"
@@ -212,16 +214,16 @@ imp_check5 <- ucmr5_select %>%
 # Average values for each facility 
 ################################################################################
 # UCMR3 -------------------------------------------------------------------
-
 ucmr3_averaged_values <- ucmr3_select %>% 
   group_by(PWSID, Contaminant) %>% 
   summarise(
     mean = mean(AnalyticalResultValue),
     na_count = sum(na),
     total_count = n(),
+    prcnt_nd = na_count/total_count,
     .groups = "drop"
   ) 
-fwrite(ucmr3_averaged_values, here("data", "intermediate", "ucmr3_averaged_pfas_values"))
+fwrite(ucmr3_averaged_values, here("data", "intermediate", "ucmr3_averaged_values"))
 
 # UCMR5 -------------------------------------------------------------------
 ucmr5_averaged_values <- ucmr5_select %>% 
@@ -230,9 +232,10 @@ ucmr5_averaged_values <- ucmr5_select %>%
     mean = mean(AnalyticalResultValue),
     na_count = sum(na),
     total_count = n(),
-    .groups = "drop"
+    prcnt_nd = na_count/total_count,
+    .groups = "drop" # grouped by multiple columns, by default only un groups the last group need this line to ungroup so later summaries are of whole data set, not just by PWSID
   )
-fwrite(ucmr5_averaged_values, here("data", "intermediate", "ucmr5_averaged_pfas_values"))
+fwrite(ucmr5_averaged_values, here("data", "intermediate", "ucmr5_averaged_values"))
   
 
   
