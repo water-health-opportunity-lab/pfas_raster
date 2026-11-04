@@ -54,17 +54,13 @@ fwrite(ucmr5, here("data", "intermediate", "ucmr5_pfas_raw"))
 # Import EPA PWIS Map
 ################################################################################
 ## Version 3.0 downloaded from github (https://github.com/USEPA/ORD_SAB_Model/tree/main/Output_Data) (last updated: 03/17/2026; accessed: 10/09/2026)
-pws <- read_sf(here("data", "raw", "EPA_CWS_V1")) %>% 
+pws <- read_sf(here("data", "raw", "EPA_CWS_V1"))
   select(PWSID, geometry)
 saveRDS(pws, here("data", "intermediate", "epa_pws.rds"))
 
 ################################################################################
-# Import ZIP codes
+# Import PWIS ZIP codes served, add geometries
 ################################################################################
-# Shape files of UCMR 3 and 5 ZIP codes corresponding to PWSID
-zip3 <- fread(here("data/raw/ucmr3/UCMR3_ZIPCodes.txt"))
-zip5 <- fread(here("data/raw/ucmr5/UCMR5_ZIPCodes.txt"))
-
 # Shape files of ZCTAs to merge
 zcta3 <- tigris::zctas(year = 2013) %>% 
   rename(ZIP = matches("^ZCTA5CE")) %>% 
@@ -72,3 +68,20 @@ zcta3 <- tigris::zctas(year = 2013) %>%
 zcta5 <- tigris::zctas(year = 2023) %>% 
   rename(ZIP = matches("^ZCTA5CE")) %>% 
   select(ZIP)
+
+# Shape files of UCMR 3 and 5 ZIP codes corresponding to PWSID
+## Read in UCMR ZIP files and join ZCTA geometry
+zip3 <- fread(here("data/raw/ucmr3/UCMR3_ZIPCodes.txt"),
+              colClasses = list(character = "ZIPCODE")) %>% 
+  rename(ZIP = "ZIPCODE") %>% 
+  left_join(zcta3, by = "ZIP")
+saveRDS(zip3, here("data/intermediate/zip3"))
+
+zip5 <- fread(here("data/raw/ucmr5/UCMR5_ZIPCodes.txt"), 
+              colClasses = list(character = "ZIPCODE")) %>% 
+  rename(ZIP = "ZIPCODE") %>% 
+  left_join(zcta5, by = "ZIP")
+saveRDS(zip5, here("data/intermediate/zip5"))
+
+
+

@@ -9,6 +9,8 @@ source(here::here("R/0-config.R"))
 # Load relevant raw and intermediate data sets (see 0-config)
 ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw"))
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
+zip3 <- readRDS(here("data/intermediate/zip3"))
+zip5 <- readRDS(here("data/intermediate/zip5"))
 
 ################################################################################
 # Investigate UCMR and PWS data 
@@ -16,10 +18,17 @@ ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
 # INSIGHTS FROM CODE BELOW ------------------------------------------------
 ## Does each PWS facility have a reading each year for each PFAS? A: No, majority sampled over 12 month period.
 
-## What is the % of detection for all PFAS combined? A: ucmr3 - 0.52%; ucmr5 - 3.03% 
+## What is the % of detection for all PFAS combined? 
+### A: ucmr3 - 0.52%; ucmr5 - 3.03% 
 
-## Differences in PWSID names measuring in 3 vs 5? A: 4438 shared PWSID names in both, 482 unique to 3, 5874 unique to 5
-## Differences in PWSID names measuring in 3 and 5 vs EPA PWS .shp file? A: 3 - 4639 shared, 281 diff; 5 - 9769 shared, 543 diff
+## Differences in PWSID names measuring in 3 vs 5? 
+### A: 4438 shared PWSID names in both, 482 unique to 3, 5874 unique to 5
+
+## Differences in PWSID names measuring in 3 and 5 vs EPA PWS .shp file? 
+### A: 3 - 4639 shared, 281 diff; 5 - 9769 shared, 543 diff
+
+## For PWSID without geometries, how many have associated ZIP codes with available ZCTA geometry? 
+### A: UCMR3: 182 with a zip, 99 without zip geometry
 
 # UCMR3 -------------------------------------------------------------------
 ## Filter by individual PWS facility for unique readings of PFAS per year
@@ -148,8 +157,26 @@ pws5_all_only5 <- pws5 %>%
 fwrite(pws_all_us, here("data", "intermediate", "epa_all_pwsids"))
 fwrite(pws3_all_only3, here("data", "intermediate", "ucmr3_pwsid_name_different"))
 fwrite(pws5_all_only5, here("data", "intermediate", "ucmr5_pwsid_name_different"))
-  
 
+
+# ZIP replacements for PWSID with missing geometries ----------------------
+# PWS in UCMR3 and 5 with missing geometries from EPA data set
+ucmr3_geom_missing <- fread(here("data/intermediate/ucmr3_pwsid_name_different"))
+ucmr5_geom_missing <- fread(here("data/intermediate/ucmr5_pwsid_name_different"))
+
+# ZIP codes without corresponding ZCTA geometry 
+zip3_missing <- zip3 %>% 
+  filter(st_is_empty(geometry))
+zip5_missing <- zip5 %>% 
+  filter(st_is_empty(geometry))
+
+# Tigris ZIP codes 
+
+# PWSID without PWS or ZIP geometries available
+ucmr3_missing_pws_and_zip <- ucmr3_geom_missing %>% 
+  filter(PWSID %in% zip3_missing$PWSID)
+ucmr5_missing_pws_and_zip <- ucmr5_geom_missing %>% 
+  filter(PWSID %in% zip5_missing$PWSID)
 
 ################################################################################
 # Select and clean data - filter columns and  impute for NAs
