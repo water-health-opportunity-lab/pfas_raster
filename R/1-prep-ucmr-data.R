@@ -160,23 +160,30 @@ fwrite(pws5_all_only5, here("data", "intermediate", "ucmr5_pwsid_name_different"
 
 
 # ZIP replacements for PWSID with missing geometries ----------------------
-# PWS in UCMR3 and 5 with missing geometries from EPA data set
+# UCMRw without PWS geometries from EPA data set
 ucmr3_geom_missing <- fread(here("data/intermediate/ucmr3_pwsid_name_different"))
 ucmr5_geom_missing <- fread(here("data/intermediate/ucmr5_pwsid_name_different"))
 
-# ZIP codes without corresponding ZCTA geometry 
+# PWS (identified with ZIP codes) without corresponding ZCTA geometry 
 zip3_missing <- zip3 %>% 
   filter(st_is_empty(geometry))
 zip5_missing <- zip5 %>% 
   filter(st_is_empty(geometry))
-
-# Tigris ZIP codes 
 
 # PWSID without PWS or ZIP geometries available
 ucmr3_missing_pws_and_zip <- ucmr3_geom_missing %>% 
   filter(PWSID %in% zip3_missing$PWSID)
 ucmr5_missing_pws_and_zip <- ucmr5_geom_missing %>% 
   filter(PWSID %in% zip5_missing$PWSID)
+## Table of above values
+missing_both_table <- tibble(
+  PWSID = union(ucmr3_missing_pws_and_zip$PWSID, ucmr5_missing_pws_and_zip$PWSID)
+) %>%
+  mutate(
+    in_UCMR3 = PWSID %in% ucmr3_missing_pws_and_zip$PWSID,
+    in_UCMR5 = PWSID %in% ucmr5_missing_pws_and_zip$PWSID
+  ) %>%
+  arrange(PWSID)
 
 ################################################################################
 # Select and clean data - filter columns and  impute for NAs
