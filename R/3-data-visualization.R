@@ -12,10 +12,18 @@ ucmr5_pfoa_sf <- read_sf(here("data", "final", "ucmr5_PFOA_ave_values.shp"))
 
 ucmr3_pfoa_rast <- rast(here("data/final/ucmr3_PFOA_rast.tif"))
 
+pdf(file = here("figures/ucmr3_pfoa_sf.pdf"))
 ggplot(ucmr3_pfoa_sf) +
-  geom_sf(aes(fill = mean), color = NA)
+  geom_sf(aes(fill = mean), color = NA) +
+  scale_fill_viridis_c(trans = "log10")+
+  theme_minimal() 
+dev.off()
 
-ggplot(ucmr5_pfoa_sf) +
-  geom_sf(aes(fill = mean), color = NA)
+pdf(file = here("figures/ucmr3_pfoa_rast.pdf"))
+ggplot() +
+  geom_spatraster(data = ucmr3_pfoa_rast) +
+  scale_fill_viridis_c(trans = "log10", na.value = "transparent")+
+  theme_minimal() 
+dev.off()
 
 

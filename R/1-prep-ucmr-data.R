@@ -27,7 +27,7 @@ zip5 <- readRDS(here("data/intermediate/zip5"))
 ## Differences in PWSID names measuring in 3 and 5 vs EPA PWS .shp file? 
 ### A: 3 - 4639 shared, 281 diff; 5 - 9769 shared, 543 diff
 
-## For PWSID without geometries, how many have associated ZIP codes with available ZCTA geometry? 
+## How many PWSID without geometries, how many have associated ZIP codes with available ZCTA geometry? 
 ### A: UCMR3: 182 with a zip, 99 without zip geometry
 
 # UCMR3 -------------------------------------------------------------------
@@ -128,7 +128,7 @@ ggplot(nas_ucmr5, aes(x = Contaminant, y = n, fill = is_na)) +
     legend.position = "top"
   )
 # Comparison of PWSID in each data set ------------------------------------
-ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw")) # @cindy ease of use for me, is this best practice?
+ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw")) 
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
 
 pws3 <- ucmr3 %>% 
@@ -142,15 +142,17 @@ pws_only3 <- pws3 %>%
 pws_only5 <- pws5 %>% 
   anti_join(pws3, by ="PWSID")
 
-#### Compare PWS data and UCMR data
+#### Compare EPA PWS shape files and UCMR data 
 pws_all_us <- pws %>% 
   distinct(PWSID)
 pws3_all_both <- pws3 %>% 
   semi_join(pws_all_us, by ="PWSID")
+# ucmr3 pwsid missing geometry
 pws3_all_only3 <- pws3 %>% 
   anti_join(pws_all_us, by = "PWSID")
 pws5_all_both <- pws5 %>% 
   semi_join(pws_all_us, by = "PWSID")
+# ucmr5 pwsid missing geometry
 pws5_all_only5 <- pws5 %>% 
   anti_join(pws_all_us, by = "PWSID")
 
@@ -158,6 +160,13 @@ fwrite(pws_all_us, here("data", "intermediate", "epa_all_pwsids"))
 fwrite(pws3_all_only3, here("data", "intermediate", "ucmr3_pwsid_name_different"))
 fwrite(pws5_all_only5, here("data", "intermediate", "ucmr5_pwsid_name_different"))
 
+missing_geom <- tibble(PWSID = union(pws3_all_only3$PWSID, pws5_all_only5$PWSID)) %>% 
+  mutate(
+    ucmr3_missing = PWSID %in% pws3_all_only3$PWSID,
+    ucmr5_missing = PWSID %in% pws5_all_only5$PWSID
+  )
+
+fwrite(missing_geom, here("data/intermediate/geom_missing.csv"))
 
 # ZIP replacements for PWSID with missing geometries ----------------------
 # UCMRw without PWS geometries from EPA data set
@@ -184,6 +193,7 @@ missing_both_table <- tibble(
     in_UCMR5 = PWSID %in% ucmr5_missing_pws_and_zip$PWSID
   ) %>%
   arrange(PWSID)
+fwrite(missing_both_table, here("data/intermediate/missing_both_table.csv")) 
 
 ################################################################################
 # Select and clean data - filter columns and  impute for NAs

@@ -7,7 +7,7 @@
 # Restore r environment 
 renv::restore()
 ################################################################################
-#Load libraries
+# Load libraries
 library(here)
 library(renv)
 
@@ -17,6 +17,7 @@ library(lubridate)
 
 library(sf)
 library(terra)
+library(tidyterra)
 library(tigris)
 options(tigris_use_cache = TRUE)
 
@@ -54,7 +55,7 @@ fwrite(ucmr5, here("data", "intermediate", "ucmr5_pfas_raw"))
 # Import EPA PWIS Map
 ################################################################################
 ## Version 3.0 downloaded from github (https://github.com/USEPA/ORD_SAB_Model/tree/main/Output_Data) (last updated: 03/17/2026; accessed: 10/09/2026)
-pws <- read_sf(here("data", "raw", "EPA_CWS_V1"))
+pws <- read_sf(here("data", "raw", "EPA_CWS_V1")) %>% 
   select(PWSID, geometry)
 saveRDS(pws, here("data", "intermediate", "epa_pws.rds"))
 
