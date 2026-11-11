@@ -93,6 +93,7 @@ shape_and_raster_files_ucmr_pfas(
 
 # posterior file check----------------------------------------------------
 # how many empty geometries in each shape file?
+## A: UCMR3: 99, UCMR5: 
 
 shp_files <- list.files(here("data", "final"), pattern = "_ave_values\\.shp$", full.names = TRUE)
 

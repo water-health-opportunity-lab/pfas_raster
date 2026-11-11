@@ -75,14 +75,16 @@ zcta5 <- tigris::zctas(year = 2023) %>%
 zip3 <- fread(here("data/raw/ucmr3/UCMR3_ZIPCodes.txt"),
               colClasses = list(character = "ZIPCODE")) %>% 
   rename(ZIP = "ZIPCODE") %>% 
-  left_join(zcta3, by = "ZIP")
+  left_join(zcta3, by = "ZIP") 
 saveRDS(zip3, here("data/intermediate/zip3"))
 
 zip5 <- fread(here("data/raw/ucmr5/UCMR5_ZIPCodes.txt"), 
               colClasses = list(character = "ZIPCODE")) %>% 
   rename(ZIP = "ZIPCODE") %>% 
-  left_join(zcta5, by = "ZIP")
+  left_join(zcta5, by = "ZIP") 
 saveRDS(zip5, here("data/intermediate/zip5"))
+
+
 
 
 
