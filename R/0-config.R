@@ -14,6 +14,7 @@ library(renv)
 library(tidyverse)
 library(data.table)
 library(lubridate)
+library(readxl)
 
 library(sf)
 library(terra)
@@ -48,8 +49,21 @@ fwrite(ucmr3, here("data", "intermediate", "ucmr3_pfas_raw"))
 ucmr5 <- fread(file = here("data", "raw", "ucmr5", "UCMR5_All.txt"))%>% 
   filter(
     Contaminant %in% pfas5)
-
 fwrite(ucmr5, here("data", "intermediate", "ucmr5_pfas_raw"))
+
+
+################################################################################
+# Import Jahred's state data and EPA state data
+################################################################################
+# Jahred's data uploaded from shared folder upon request
+liddie_state_data <- read_csv(here("data/raw/Jahred_PFAS_SSD_112026(in).csv"))
+
+# EPA state data uploaded from EPA site "PFAS  Analytic Tools (https://awsedap.epa.gov/public/extensions/PFAS_Tools/PFAS_Tools.html)
+## 1. Select "Drinking Water - State" tab
+## 2. Under left column "Scope of Drinking Water Samples for Public Water Systems (PWSs):", select "All samples at PWS"
+## 3. Scroll to bottom data table and download full data table (download button located in top right corner of data table)
+
+epa_state_data <- read_excel(here("data/raw/EPA_state_PFAS_data_112026.xlsx"))
 
 ################################################################################
 # Import EPA PWIS Map

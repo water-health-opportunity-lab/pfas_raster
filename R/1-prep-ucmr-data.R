@@ -9,6 +9,7 @@ source(here::here("R/0-config.R"))
 # Load relevant raw and intermediate data sets (see 0-config)
 ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw"))
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
+
 zip3 <- readRDS(here("data/intermediate/zip3"))
 zip5 <- readRDS(here("data/intermediate/zip5"))
 
@@ -70,18 +71,14 @@ na/t # % of nas in ucmr3
 # UCMR5 -------------------------------------------------------------------
 check5 <- ucmr5 %>%
   mutate(
-    year = year(mdy(CollectionDate))
-  ) %>%
+    year = year(mdy(CollectionDate))) %>%
   mutate(
-    PWSID_FID = paste0(PWSID, "_", FacilityID)
-  ) %>%
+    PWSID_FID = paste0(PWSID, "_", FacilityID)) %>%
   distinct(
-    PWSID_FID, Contaminant, year
-  ) %>%
+    PWSID_FID, Contaminant, year) %>%
   count(
     PWSID_FID,
-    name = "n"
-  )
+    name = "n")
 
 #### Check distribution of unique yearly readings
 hist(check5$n)
@@ -89,8 +86,7 @@ hist(check5$n)
 #### Check n facilities with more than 2 unique years of data
 outlier5 <- check5 %>% 
   filter(
-    !(n %in% c(29, 58))
-  )
+    !(n %in% c(29, 58)))
 nrow(outlier5)
 
 #### n NAs 
@@ -168,7 +164,7 @@ missing_geom <- tibble(PWSID = union(pws3_all_only3$PWSID, pws5_all_only5$PWSID)
 
 fwrite(missing_geom, here("data/intermediate/geom_missing.csv"))
 
-# ZIP replacements for PWSID with missing geometries ----------------------
+# PWSID with missing geometries  -----------------------------------------------
 # UCMRw without PWS geometries from EPA data set
 ucmr3_geom_missing <- fread(here("data/intermediate/ucmr3_pwsid_name_different"))
 ucmr5_geom_missing <- fread(here("data/intermediate/ucmr5_pwsid_name_different"))

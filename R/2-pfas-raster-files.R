@@ -105,7 +105,7 @@ geom_check <- map_dfr(shp_files, \(f) {
   )
 })
 
-print(geom_check, n = (ncell(pfas3)+ncell(pfas5))) #
+print(geom_check, n = Inf) # for each PFAS - U3: 99, U5: 67
 
 missing_both <- read_csv(here("data/intermediate/missing_both_table.csv"))
 sum(missing_both$in_UCMR3) # 99

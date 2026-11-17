@@ -11,8 +11,18 @@ execute:
 # Organization: WHO LAB
 # Project: K01 Aim 1: Surface level PFAS exposure map
 # Author: Jordan Fischbach, Claude
-# Purpose: This file uploads, processes, and compares Jahred and EPA state PFAS data
+# Purpose: This fileprocesses, and compares Jahred and EPA state PFAS data with UCMR data
 ################################################################################
 ################################################################################
 source(here::here("R/0-config.R")) 
 ################################################################################
+liddie_state_data <- fread(here("data"))
+```
+
+# Load Jahred and EPA data and select relevent columns 
+```{r}
+liddie_state_data_select <- fread(jahr)
+%>% 
+  select(PWSID, Contaminant, Concentration, )
+```
+
