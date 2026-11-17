@@ -1,0 +1,18 @@
+---
+title: "Upload and process state PFAS data"
+format: pdf
+execute:
+  echo: true
+  warning: false
+---
+# Project description and data loading
+```{r}
+################################################################################
+# Organization: WHO LAB
+# Project: K01 Aim 1: Surface level PFAS exposure map
+# Author: Jordan Fischbach, Claude
+# Purpose: This file uploads, processes, and compares Jahred and EPA state PFAS data
+################################################################################
+################################################################################
+source(here::here("R/0-config.R")) 
+################################################################################
