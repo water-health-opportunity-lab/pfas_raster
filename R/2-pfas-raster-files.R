@@ -2,7 +2,7 @@
 # Organization: WHO LAB
 # Project: K01 Aim 1: Surface level PFAS exposure map
 # Author: Jordan Fischbach, Claude
-# Purpose: This file creates individual shapefiles and 1 km raster files for each PFAS
+# Purpose: This file creates individual shape files and 1 km raster files for each PFAS
 ################################################################################
 source(here::here("R/0-config.R")) 
 ################################################################################

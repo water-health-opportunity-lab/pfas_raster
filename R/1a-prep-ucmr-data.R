@@ -31,22 +31,18 @@ zip5 <- readRDS(here("data/intermediate/zip5"))
 ## How many PWSID without geometries, how many have associated ZIP codes with available ZCTA geometry? 
 ### A: UCMR3: 182 with a zip, 99 without zip geometry
 
-# UCMR3 -------------------------------------------------------------------
+# UCMR3 readings per PWSID -------------------------------------------------------------------
 ## Filter by individual PWS facility for unique readings of PFAS per year
 check3 <- ucmr3 %>%
   mutate(
-    year = year(mdy(CollectionDate))
-      ) %>%
+    year = year(mdy(CollectionDate))) %>%
   mutate(
-    PWSID_FID = paste0(PWSID, "_", FacilityID)
-  ) %>%
+    PWSID_FID = paste0(PWSID, "_", FacilityID)) %>%
   distinct(
-    PWSID, PWSID_FID, Contaminant, year
-  ) %>%
+    PWSID, PWSID_FID, Contaminant, year) %>%
   count(
-    PWSID,PWSID_FID,
-    name = "n"
-    ) 
+    PWSID, PWSID_FID,
+    name = "n") 
 
 #### Check distribution of unique yearly readings
 hist(check3$n)
@@ -277,15 +273,4 @@ ucmr5_averaged_values <- ucmr5_select %>%
   )
 fwrite(ucmr5_averaged_values, here("data", "intermediate", "ucmr5_averaged_values"))
   
-
-  
-
-  
-  
-
-
-
-
-
-
 

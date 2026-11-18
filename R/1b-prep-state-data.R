@@ -45,10 +45,12 @@ overlap_epa_liddie <- comparison_liddie %>%
     comparison_epa_state,
     by = c("PWSID", "Sample_Collection_Date", "Contaminant")) %>% 
   distinct(PWSID, Sample_Collection_Date, Contaminant)
+fwrite(overlap_epa_liddie, here("data/intermediate/overlap_epa_liddie.csv"))
 
-# Same as above, but compare concentrations
+
+
 ################################################################################
-# Clean data
+# Clean data - needs work
 ################################################################################
 # NA imputation and selection of columns ----------------------------------
 # Liddie: Simple substitution with DL/√2, impute 0 if DL missing
