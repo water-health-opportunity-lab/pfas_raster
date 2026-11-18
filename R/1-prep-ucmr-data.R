@@ -2,11 +2,11 @@
 # Organization: WHO LAB
 # Project: K01 Aim 1: Surface level PFAS exposure map
 # Author(s): Jordan Fischbach, Claude
-# Purpose: Import UCMR3 and UCMR5 data and conduct manipulation, cleaning, and exploratory data characterization
+# Purpose:  UCMR3 and UCMR5 data: Manipulate, clean, and explore data 
 ################################################################################
 source(here::here("R/0-config.R")) 
 ################################################################################
-# Load relevant raw and intermediate data sets (see 0-config)
+# Load relevant raw and intermediate data sets (see 0-config) --------------
 ucmr3 <- fread(here("data", "intermediate", "ucmr3_pfas_raw"))
 ucmr5 <- fread(here("data", "intermediate", "ucmr5_pfas_raw"))
 
@@ -25,8 +25,8 @@ zip5 <- readRDS(here("data/intermediate/zip5"))
 ## Differences in PWSID names measuring in 3 vs 5? 
 ### A: 4438 shared PWSID names in both, 482 unique to 3, 5874 unique to 5
 
-## Differences in PWSID names measuring in 3 and 5 vs EPA PWS .shp file? 
-### A: 3 - 4639 shared, 281 diff; 5 - 9769 shared, 543 diff
+## Differences in PWSID names measured in UCMR3 and 5 vs EPA UCMR3 and 5 PWS .shp files? 
+### A: 3 - 4639 shared, 281 different; 5 - 9769 shared, 543 different
 
 ## How many PWSID without geometries, how many have associated ZIP codes with available ZCTA geometry? 
 ### A: UCMR3: 182 with a zip, 99 without zip geometry
@@ -197,10 +197,10 @@ fwrite(missing_both_table, here("data/intermediate/missing_both_table.csv"))
 # Select relevant columns  ------------------------------------------------
 ucmr3_select <- ucmr3 %>% 
   select(
-    PWSID, Contaminant, MRL, AnalyticalResultValue)
+    PWSID, CollectionDate, Contaminant, MRL, AnalyticalResultValue)
 ucmr5_select <- ucmr5 %>% 
   select(
-    PWSID, Contaminant, MRL, AnalyticalResultValue) 
+    PWSID, CollectionDate, Contaminant, MRL, AnalyticalResultValue) 
 
 # Impute NA values --------------------------------------------------------
 ## Imputed as DL/sqrt 2 (Hu 2021 - Table 1)

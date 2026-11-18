@@ -28,6 +28,7 @@ library(ggplot2)
 ## PFAS included in UCMR3 and UCMR5 respectively (all PFAS in 3 present in 5)
 pfas3 <- c("PFBS","PFHpA","PFHxS","PFNA","PFOA","PFOS")
 pfas5 <- c("PFOS", "PFOA", "HFPO-DA", "PFHxS", "PFNA", "PFBS", "PFBA", "PFHxA", "PFDA", "6:2 FTS", "8:2 FTS", "4:2 FTS", "ADONA", "11Cl-PF3OUdS", "9Cl-PF3ONS", "NFDHA", "PFEESA", "PFMPA", "PFMBA", "PFDoA", "PFHpS", "PFHpA", "PFPeS", "PFPeA", "PFUnA", "NEtFOSAA", "NMeFOSAA", "PFTA", "PFTrDA")
+pfas_liddie <- c("PFBS", "PFHxS", "PFOS", "PFOA", "PFNA")
 
 
 ################################################################################
@@ -38,18 +39,21 @@ pfas5 <- c("PFOS", "PFOA", "HFPO-DA", "PFHxS", "PFNA", "PFBS", "PFBA", "PFHxA", 
 ## downloaded 09/14/2026 - last file update 04/03/2024
 ### Click "UCMR 3 Occurrence Data Text Files (zip)" under "UCMR 3 (2013-2015) Occurrence Data" to download
 
-ucmr3 <-  fread(file = here("data", "raw", "ucmr3", "UCMR3_All.txt")) %>% 
-  filter(
-    Contaminant %in% pfas3)
-fwrite(ucmr3, here("data", "intermediate", "ucmr3_pfas_raw"))
+ucmr3 <-  fread(file = here("data/raw/ucmr3/UCMR3_All.txt"),   
+                quote = "",
+                encoding = "Latin-1") %>% 
+  filter(Contaminant %in% pfas3)
+fwrite(ucmr3, here("data/intermediate/ucmr3_pfas_raw.csv"))
 
 ## UCMR5 data downloaded from https://www.epa.gov/dwucmr/occurrence-data-unregulated-contaminant-monitoring-rule
 ## downloaded 10/16/2026 - last file update 10/15/2026
 ### Click "UCMR 5 Occurrence Data Text Files (zip)" under "UCMR 5 (2023-2025) Occurrence Data" to download
-ucmr5 <- fread(file = here("data", "raw", "ucmr5", "UCMR5_All.txt"))%>% 
+ucmr5 <- fread(file = here("data", "raw", "ucmr5", "UCMR5_All.txt"),   
+               quote = "",
+               encoding = "Latin-1") %>% 
   filter(
     Contaminant %in% pfas5)
-fwrite(ucmr5, here("data", "intermediate", "ucmr5_pfas_raw"))
+fwrite(ucmr5, here("data", "intermediate", "ucmr5_pfas_raw.csv"))
 
 
 ################################################################################

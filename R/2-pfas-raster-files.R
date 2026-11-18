@@ -92,7 +92,7 @@ shape_and_raster_files_ucmr_pfas(
 # posterior file check----------------------------------------------------
 # how many empty geometries in each shape file?
 ## A: UCMR3: 99, UCMR5: 67
-## in missing_both table, 99 ucmr3, 25 ucmr5 - what happened???
+### in missing_both table, 99 ucmr3, 25 ucmr5 - what happened in UCMR5 code that made 67 missing geometries???
 
 shp_files <- list.files(here("data", "final"), pattern = "_ave_values\\.shp$", full.names = TRUE)
 
@@ -105,8 +105,8 @@ geom_check <- map_dfr(shp_files, \(f) {
   )
 })
 
-print(geom_check, n = Inf) # for each PFAS - U3: 99, U5: 67
+print(geom_check, n = (ncell(pfas3)+ncell(pfas5))) # u3: 99 u5:67
 
 missing_both <- read_csv(here("data/intermediate/missing_both_table.csv"))
-sum(missing_both$in_UCMR3) # 99
-sum(missing_both$in_UCMR5) # 25
+sum(missing_both$in_UCMR3) # u3: 99
+sum(missing_both$in_UCMR5) # u5: 25
