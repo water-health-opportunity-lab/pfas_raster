@@ -10,34 +10,31 @@ source(here::here("R/0-config.R"))
 ucmr3_pfoa_sf <- read_sf(here("data", "final", "ucmr3_PFOA_ave_values.shp"))
 ucmr3_pfoa_rast <- rast(here("data/final/ucmr3_PFOA_rast.tif"))
 ################################################################################
-# Check shape and raster files ------------------------------------------------
-# UCMR 3 PFOA in NY
-## Create NY shape and rasters
+# Data check: NY PFAS shape and raster maps -----------------------------------
+# Create NY outline
 zoom_NY <- tigris::states(cb = TRUE, year = 2022) %>% 
   filter(STUSPS == "NY") %>% 
   st_transform(5070)
-
+# Crop shape and rast files to NY
 NY_ucmr3_pfoa_sf <- st_filter(ucmr3_pfoa_sf, zoom_NY)
 NY_ucmr3_pfoa_rast <- crop(ucmr3_pfoa_rast, vect(zoom_NY), mask = TRUE)
 
+# NY UCMR PFAS shape file map
 pdf(file = here("figures/NY_ucmr3_pfoa_sf.pdf"))
+
 ggplot(data = NY_ucmr3_pfoa_sf) +
   geom_sf(aes(fill = mean), color = NA) +
-  scale_fill_viridis_c(
-    limits = c(0.007, 0.01),
-    oob = scales::squish,
-    breaks = c(0.0, 0.025, 0.05, 0.075, 0.1),
-    labels = c("0.01", "0.025", "0.05", "0.075", ">0.1"),
-    na.value = "transparent"
-  ) +
+  scale_fill_viridis_c(transform = "log10")+
   theme_void() + 
   coord_sf(datum = NA) 
+
 dev.off()
 
+# NY UCMR 3 Raster map
 pdf(file = here("figures/NY_ucmr3_pfoa_rast.pdf"))
 ggplot() +
   geom_spatraster(data = NY_ucmr3_pfoa_rast) +
-  scale_fill_viridis_c() +
+  scale_fill_viridis_c(na.value = "transparent") +
   coord_sf(datum = NA) +
   theme_void() 
 dev.off()

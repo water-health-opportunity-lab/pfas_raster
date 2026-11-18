@@ -10,19 +10,17 @@ renv::restore()
 # Load libraries
 library(here)
 library(renv)
-
 library(tidyverse)
 library(data.table)
 library(lubridate)
 library(readxl)
-
 library(sf)
 library(terra)
 library(tidyterra)
 library(tigris)
 options(tigris_use_cache = TRUE)
-
 library(ggplot2)
+library(fs)
 
 # Global variables
 ## PFAS included in UCMR3 and UCMR5 respectively (all PFAS in 3 present in 5)
